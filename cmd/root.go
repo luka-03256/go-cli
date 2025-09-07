@@ -4,11 +4,25 @@ Copyright © 2025 NAME HERE <EMAIL ADDRESS>
 */
 package cmd
 
+
 import (
 	"os"
 
 	"github.com/spf13/cobra"
+
+	"fmt"
+
+	"github.com/luka-03256/go-cli/todo"
 )
+
+/*import (
+	"fmt"
+	"os"
+
+	"github.com/spf13/cobra"
+
+	"github.com/spf13/viper"
+)*/
 
 
 
@@ -30,9 +44,18 @@ to quickly create a Cobra application.`,
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
+	/*
 	err := rootCmd.Execute()
 	if err != nil {
 		os.Exit(1)
+	}
+	*/
+
+	err := rootCmd.Execute()
+	// deprecated version of error handling
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(-1)
 	}
 }
 
@@ -46,6 +69,8 @@ func init() {
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
+	rootCmd.AddCommand(todo.TodoCmd)
 }
 
 

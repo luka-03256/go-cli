@@ -1,1 +1,9 @@
+# Exclude executable files
+./go-cli
+
+# Omit certain file extensions
+*.json
 *.txt
+*.bson
+*.exe
+*.bin

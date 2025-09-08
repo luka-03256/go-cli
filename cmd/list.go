@@ -7,42 +7,95 @@ package cmd
 import (
 	"fmt"
 
+	"log"
+
+	"sort"
+
+	"os"
+
 	"github.com/spf13/cobra"
 
 	"github.com/luka-03256/go-cli/todo"
 
-	"log"
+	"text/tabwriter"
 )
+
+
+var sortBy string
+var sortDesc bool
 
 // listCmd represents the list command
 var listCmd = &cobra.Command{
 	Use:   "list",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "List the todos",
+	Long: `List will display all todos, optionally sorted by criteria like priority.`,
 	Run: listRun,
 }
 
-
 func listRun(cmd *cobra.Command, args []string) {
-	items, err := todo.ReadItems("todos.json")
-	if err != nil {
-		log.Printf("%v", err)
-	}
+    items, err := todo.ReadItems(dataFile)
+    if err != nil {
+        log.Fatalf("Error reading todos: %v", err)
+    }
+    
+    // conditionall sort if --sort=priority is passed
+    /*if sortBy == "priority" {
+    	sort.Sort(todo.ByPriority(items))
+    }*/
 
-	fmt.Println("Todos list:")
-	for i, item := range items {
-		status := " "
-		if item.Done {
-			status = "x"
-		}
-		fmt.Printf("%d. [%s] %s\n", i+1, status, item.Text)
-	}
+    // conditionall sort by all todos column names 'Priority','Done','Text'
+    switch sortBy {
+	    case "priority":
+		    sort.Sort(todo.ByPriority(items))
+	    case "text":
+		    sort.Sort(todo.ByText(items))
+	    case "done":
+		    sort.Sort(todo.ByDone(items))
+	    case "":
+		    // No sorting
+	    default:
+		    fmt.Printf("Unknown sort ption: %s\n", sortBy)
+		    return
+    }
+
+    // if --desc is set, reverse the list
+    if sortDesc {
+        for i, j := 0, len(items)-1; i<j; i, j = i+1, j-1 {
+            items[i], items[j] = items[j], items[i]
+        }
+    }
+
+
+    // Tabwriter for formatting output
+    w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
+
+    fmt.Fprintln(w, "No.\tStatus\tPriority\tTask")
+
+    for i, item := range items {
+        status := " "
+        if item.Done {
+            status = "x"
+        }
+
+        // Map priority number to readable label
+        var priorityLabel string
+        switch item.Priority {
+        case 1:
+            priorityLabel = "High"
+        case 2:
+            priorityLabel = "Medium"
+        case 3:
+            priorityLabel = "Low"
+        default:
+            priorityLabel = fmt.Sprintf("%d", item.Priority)
+        }
+
+        fmt.Fprintf(w, "%d.\t[%s]\t%s\t%s\n", i+1, status, priorityLabel, item.Text)
+    }
+
+    w.Flush()
 }
+
 
 func init() {
 	rootCmd.AddCommand(listCmd)
@@ -52,6 +105,8 @@ func init() {
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
 	// listCmd.PersistentFlags().String("foo", "", "A help for foo")
+	listCmd.Flags().StringVarP(&sortBy, "sort", "s", "", "Sort by: priority, text, or done")
+    listCmd.Flags().BoolVar(&sortDesc, "desc", false, "Sort in descending order")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:

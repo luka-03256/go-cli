@@ -39,7 +39,7 @@ func doneRun(cmd *cobra.Command, args []string) {
 		log.Fatalf("Invalid index: %v", args[0])
 	}
 
-	items, err := todo.ReadItems("todos.json")
+	items, err := todo.ReadItems(dataFile)
 	if err != nil {
 		log.Fatalf("Failed to read todos: %v", err)
 	}
@@ -49,7 +49,7 @@ func doneRun(cmd *cobra.Command, args []string) {
 
 	items[index-1].Done = true
 
-	err = todo.SaveItems("todos.json", items)
+	err = todo.SaveItems(dataFile, items)
 	if err != nil {
 		log.Fatalf("Failed to save todos: %v", err)
 	}

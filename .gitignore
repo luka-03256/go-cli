@@ -1,9 +1,20 @@
-# Exclude executable files
-./go-cli
+# Ignore executable files
+go-cli
+*.exe
+*.bin
 
-# Omit certain file extensions
+# Ignore JSON, text, and BSON data files
 *.json
 *.txt
 *.bson
-*.exe
-*.bin
+
+# Ignore dumps and logs
+*.dump
+*.log
+*.lst
+*.imp
+
+# Ignore editor temporary files
+*~
+*.swp
+

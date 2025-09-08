@@ -109,6 +109,13 @@ func (i *Item) SetPriority(pri int) {
 	}
 }
 
+func (i *Item) PrettyDone() string {
+	if i.Done {
+		return "X"
+	}
+	return ""
+}
+
 // Sort todos alphabetically by text
 type ByText []Item
 func (a ByText) Len() int           { return len(a) }

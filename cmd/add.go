@@ -11,6 +11,8 @@ import (
 
 	"github.com/luka-03256/go-cli/todo"
 
+	"github.com/spf13/viper"
+
 )
 
 var priority int
@@ -53,7 +55,7 @@ func addRun(cmd *cobra.Command, args []string) {
     }
 
     //Read existing todos
-    items, err := todo.ReadItems(dataFile)
+    items, err := todo.ReadItems(viper.GetString("datafile"))
     if err != nil {
         fmt.Printf("Failed to read todos: %v\n", err)
         return
@@ -67,7 +69,7 @@ func addRun(cmd *cobra.Command, args []string) {
     }
 
     // Save the updated list
-    err = todo.SaveItems(dataFile, items)
+    err = todo.SaveItems(viper.GetString("dataFile"), items)
     if err != nil {
         fmt.Printf("Failed to save todos: %v\n", err)
         return
